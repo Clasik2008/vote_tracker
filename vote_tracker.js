@@ -1,63 +1,54 @@
-$(function() {
-  var galleryArray = [];
-  var kittenImages;
-
-
-  function tracker() {
-      getDifferentImage = function(img1, img2) {
-      var newNum;
-      do {
-        newNum = Math.floor(Math.random() * kittenImages.length);
-      } while (newNum === img1 || newNum === img2);
-      return newNum;
-      }
-
-     displayImage = function() {
-      $("img#one").attr("src", kittenImages[img1].link);
-      }
-      var img1 = Math.floor(Math.random() * kittenImages.length);
-      var img2 = getDifferentImage(img2, img2);
-    };
-   };
-  //grab image album from hosted site using ajax
-
-  var Photo = function() {
-      this.votes = 0;
-  }
-
-  var database = function() {
+ $(document).ready(function() {
+//grab image album from hosted site using ajax
     $.ajax({
       url: "https://api.imgur.com/3/album/2MJ1V.json",
-      method: 'GET',
       headers: {
         "Authorization": "Client-ID 2da3cb73277c0a7"
+      }
+    })
+
+      .done(function(data) {
+        var imageGallery = [];
+        var kittenImages = data.data.images;
+        var imageCount = data.data.images_count;
+
+        for(var i = 0; i < kittenImages.length; i++) {
+          imageGallery.push(new Photo());
+        }
+      tracker.getKittens(kittenImages);
+      })
+
+   function Photo() {
+      this.votes = 0;
     }
 
-    }).done(function(data) {
-      kittenImages = data.data.images;
-      for(var i = 0; i < kittenImages.length; i++) {
-      galleryArray.push(new Photo(i));
+    var tracker = {
+      vote1: "",
+      vote2: "",
     }
-      $(tracker());
 
-      console.log("bueno!!");
-    }).fail(function(data) {
-        console.log("no bueno");
-    });
-  }
+    tracker.generateRandom = function(images) {
+      return Math.floor(Math.random() * images);
+    }
 
-  database();
+    tracker.getKittens = function(images) {
+      tracker.vote1 = tracker.generateRandom();
+      tracker.vote2 = tracker.generateRandom();
+
+      while (tracker.vote1 === tracker.vote2) {
+        tracker.vote2 = tracker.generateRandom(images);
+      }
+
+      $("img#vote1").attr("src", function(){
+        return images[tracker.vote1];
+      })
+
+      $('img#vote2').attr('src', function() {
+      return images[tracker.vote2];
+      })
+    }
 });
 
-
-// var galleryArray = [];
-// //loop to add the images to the array
-// for (i = 0; i < 14; i++) {
-//   var add ="cat" + i + ".jpg";
-//   galleryArray.push([add]);
-// }
-// //console.log(galleryArray);
-//tracker object should have the generateRandom
 
 
 
